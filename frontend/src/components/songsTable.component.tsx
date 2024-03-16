@@ -21,17 +21,27 @@ export const SongsTable = () => {
     setSortConfig({ key, direction });
   };
 
+  function getValue(value) {
+    return typeof value === "number"
+      ? value
+      : isNaN(parseFloat(value))
+      ? value
+      : parseFloat(value);
+  }
+
   const sortedSongs = [...songs].sort((a, b) => {
-    if (sortConfig.key) {
-      if (a[sortConfig.key] < b[sortConfig.key]) {
-        return sortConfig.direction === "asc" ? -1 : 1;
-      }
-      if (a[sortConfig.key] > b[sortConfig.key]) {
-        return sortConfig.direction === "asc" ? 1 : -1;
-      }
-      return 0;
+    if (!sortConfig.key) return 0;
+
+    const valueA = getValue(a[sortConfig.key]);
+    const valueB = getValue(b[sortConfig.key]);
+
+    if (typeof valueA === "string" && typeof valueB === "string") {
+      return sortConfig.direction === "asc"
+        ? valueA.localeCompare(valueB)
+        : valueB.localeCompare(valueA);
     }
-    return 0;
+
+    return sortConfig.direction === "asc" ? valueA - valueB : valueB - valueA;
   });
 
   return (
